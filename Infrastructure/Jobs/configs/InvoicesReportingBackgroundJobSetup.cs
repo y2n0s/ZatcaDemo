@@ -19,7 +19,7 @@ namespace Infrastructure.Jobs.configs
                     trigger
                         .ForJob(jobKey)
                         .WithSchedule(CronScheduleBuilder
-                            .CronSchedule("0 */01 * * * ?")
+                            .CronSchedule("0 */03 * * * ?")
                             .InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Egypt"))));
         }
     }

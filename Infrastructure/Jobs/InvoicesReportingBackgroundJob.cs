@@ -3,6 +3,7 @@ using Application.Contracts.IServices;
 using Application.Contracts.Zatca;
 using Application.Models.Zatca;
 using Domain.Entities;
+using Domain.Entities.Fodo;
 using Domain.Helpers;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -26,6 +27,7 @@ namespace Infrastructure.Jobs
         private readonly IInvoiceRepository _invoiceRepository;
         private readonly ISupplierRepository _supplierRepository;
         private readonly ICertificateConfiguration _certificateConfiguration;
+        private readonly IFodoRepository _fodoRepository;
 
         public InvoicesReportingBackgroundJob(
             IInvoiceToZatcaRepository invoiceToZatcaRepository,
@@ -33,7 +35,8 @@ namespace Infrastructure.Jobs
             ILogger<InvoicesReportingBackgroundJob> logger,
             IInvoiceRepository invoiceRepository,
             ISupplierRepository supplierRepository,
-            ICertificateConfiguration certificateConfiguration)
+            ICertificateConfiguration certificateConfiguration,
+            IFodoRepository fodoRepository)
         {
             _invoiceToZatcaRepository = invoiceToZatcaRepository;
             _zatcaInvoiceSender = zatcaInvoiceSender;
@@ -41,48 +44,98 @@ namespace Infrastructure.Jobs
             _invoiceRepository = invoiceRepository;
             _supplierRepository = supplierRepository;
             _certificateConfiguration = certificateConfiguration;
+            _fodoRepository = fodoRepository;
         }
 
         public  async Task Execute(IJobExecutionContext context)
         {
             _logger.LogInformation("background service has been started to fetch invoice from api");
-            //call api
-            var fodoInvoices = new List<InvoiceToZatca>()
-            {
-                //Index =  1, ProductName = "Item", Quantity = 1, NetPrice = 100, Tax = 15, TaxCategory = "S"
-                new InvoiceToZatca
-                {
-                    CreationDate = DateTime.Now,
-                    DetailId=1234567,
-                    InvoiceCreationDate= DateTime.Now,
-                    InvoiceDeliveryDate= DateTime.Now,
-                    //TaxAmount=300,
-                    InvoiceId=987654321,
-                    InvoiceItemsJson="[{\"Id\":\"wjhg\",\"Index\":1,\"ProductName\":\"item 1\",\"Quantity\":2,\"NetPrice\":100,\"LineDiscount\":0,\"PriceDiscount\":0,\"TaxAmount\":0,\"TotalWithTax\":0,\"TotalWithoutTax\":0,\"GrossPrice\":100,\"Tax\":15,\"TaxCategory\":\"S\",\"TaxCategoryReasonCode\":null,\"TaxCategoryReason\":null},{\"Id\":\"hjkh\",\"Index\":1,\"ProductName\":\"item 1\",\"Quantity\":2,\"NetPrice\":100,\"LineDiscount\":0,\"PriceDiscount\":0,\"TaxAmount\":0,\"TotalWithTax\":0,\"TotalWithoutTax\":0,\"GrossPrice\":100,\"Tax\":15,\"TaxCategory\":\"S\",\"TaxCategoryReasonCode\":null,\"TaxCategoryReason\":null},{\"Id\":\"kjhkj\",\"Index\":1,\"ProductName\":\"item 1\",\"Quantity\":2,\"NetPrice\":100,\"LineDiscount\":0,\"PriceDiscount\":0,\"TaxAmount\":0,\"TotalWithTax\":0,\"TotalWithoutTax\":0,\"GrossPrice\":100,\"Tax\":15,\"TaxCategory\":\"S\",\"TaxCategoryReasonCode\":null,\"TaxCategoryReason\":null}]",
-                    IsRefundInvoice=false,
-                    IsSalesInvoice=true,
-                    IsSimplifiedInvoice=true,
-                    //IsTaxInvoice=false,
-                    TaxPercentage=15,
-                    PaymentMeans=10
-                }
-            };
 
+            #region Calling Fodo Db
+           var fodoInvoices = await _fodoRepository.GetFodoNotSentInvoicesAsync();
             _logger.LogInformation($"{fodoInvoices.Count()} invoices have been fetched from api");
-            
+
             if (!fodoInvoices.Any())
-                await Task.CompletedTask;
+                return;
+            #endregion
 
-            await _invoiceToZatcaRepository.AddRangeInvoicesAsync(fodoInvoices);
+            #region Fodo Invoices To Zatca Invoices Conversion And Saving
+            var invoicesToZatca = await MapFodoInvoicesToZatcaInvoicesAsync(fodoInvoices);
+            
+            await _invoiceToZatcaRepository.AddRangeInvoicesAsync(invoicesToZatca.ToList());
+            #endregion
 
+            #region Send Invoices To Zatca
             var invoices = await _invoiceToZatcaRepository.GetAllInvoicesToSendAsync();
             var supplier = await _supplierRepository.GetSupplierAsync();
             var certificateDetails = _certificateConfiguration.GetCertificateDetails();
 
             foreach (var invoice in invoices)
-            {      
-                await _zatcaInvoiceSender.SendInvoiceToZatcaV2Async(invoice, supplier, certificateDetails);
+            {
+                await _zatcaInvoiceSender.SendInvoiceToZatcaAsync(invoice, supplier, certificateDetails);
+
+                var fodoInvoice = fodoInvoices.SingleOrDefault(x=>x.InvoiceId == invoice.InvoiceId);
+                fodoInvoice.IsSent= true;
             }
+            #endregion
+
+            #region Update Fodo Invoices
+            await _fodoRepository.UpdateFodoSentInvoicesAsync(fodoInvoices);
+            #endregion
+        }
+
+        private async Task<IReadOnlyList<InvoiceToZatca>> MapFodoInvoicesToZatcaInvoicesAsync(
+            IReadOnlyList<InvoicesToZATCA> fodoInvoices)
+        {
+            var zatcaInvoices = new List<InvoiceToZatca>();
+
+            foreach (var fodoInvoice in fodoInvoices)
+            {
+                var zatcaInvoice = new InvoiceToZatca
+                {
+                    CompanyAddress = fodoInvoice.CompanyAddress,
+                    CompanyAddressCity = fodoInvoice.CompanyAddressCity,
+                    CompanyAddressDistrict = fodoInvoice.CompanyAddressDistrict,
+                    CompanyName = fodoInvoice.CompanyName,
+                    CompanyTaxNumber = fodoInvoice.CompanyTaxNumber,
+                    CreationDate = fodoInvoice.CreationDate,
+                    CreatorId = fodoInvoice.CreatorId,
+                    Currency = fodoInvoice.Currency,
+                    CustomerAddress = fodoInvoice.CustomerAddress,
+                    CustomerAddressCity = fodoInvoice.CustomerAddressCity,
+                    CustomerAddressDistrict = fodoInvoice.CustomerAddressDistrict,
+                    CustomerName = fodoInvoice.CustomerName,
+                    CustomerId = fodoInvoice.CustomerId,
+                    DeleteFlag = fodoInvoice.DeleteFlag,
+                    DetailId = fodoInvoice.DetailId,
+                    InsertFlag = fodoInvoice.InsertFlag,
+                    InvoiceCreationDate = fodoInvoice.InvoiceCreationDate,
+                    InvoiceId = fodoInvoice.InvoiceId,
+                    InvoiceDeliveryDate = fodoInvoice.InvoiceDeliveryDate,
+                    InvoiceItemsJson = fodoInvoice.InvoiceItemsJson,
+                    IsDeleted = fodoInvoice.IsDeleted,
+                    IsRefundInvoice = fodoInvoice.IsRefundInvoice,
+                    IsSalesInvoice = fodoInvoice.IsSalesInvoice,
+                    IsSimplifiedInvoice = fodoInvoice.IsSimplifiedInvoice,
+                    IsTaxInvoice = fodoInvoice.IsTaxInvoice,
+                    ModificationDate = fodoInvoice.ModificationDate,
+                    ModifierId = fodoInvoice.ModifierId,
+                    NetWithoutVAT = fodoInvoice.NetWithoutVAT,
+                    PaymentMeans = fodoInvoice.InvoicePayments,
+                    RefundReason = fodoInvoice.RefundReason,
+                    TaxAmount = fodoInvoice.TaxAmount,
+                    TaxPercentage = fodoInvoice.TaxPercentage,
+                    TotalAmount = fodoInvoice.TotalAmount,
+                    TotalDiscount = fodoInvoice.TotalDiscount,
+                    TotalForItems = fodoInvoice.TotalForItems,
+                    UpdateFlag = fodoInvoice.UpdateFlag,
+                    IsSent = false
+                };
+
+                zatcaInvoices.Add(zatcaInvoice);
+            }
+
+            return zatcaInvoices;
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Domain.Entities
         public bool? IsDeleted { get; set; }
         public int? CreatorId { get; set; }
         public int? ModifierId { get; set; }
-        public int? PaymentMeans { get; set; }
+        public string PaymentMeans { get; set; }
         public DateTime? CreationDate { get; set; }
         public DateTime? ModificationDate { get; set; }
         public bool IsSent { get; set; }

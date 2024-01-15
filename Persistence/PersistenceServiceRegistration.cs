@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Data;
+using Persistence.Data.Fodo;
 using Persistence.Repositories;
 using System;
 using System.Collections.Generic;
@@ -22,11 +23,18 @@ namespace Persistence
                 options.UseSqlServer(configuration.GetConnectionString("ZatcaDemoDB"));
             });
 
+            services.AddDbContext<FodoDbContext>(options =>
+            {
+                options.UseSqlServer(configuration.GetConnectionString("FodoDemoDB"));
+                //options.EnableDetailedErrors();
+            });
+
             services.AddScoped<ICertificateSettingsRepository, CertificateSettingsRepository>();
             services.AddScoped<IInvoiceRepository, InvoiceRepository>();
             services.AddScoped<ISupplierRepository, SupplierRepository>();
             services.AddScoped<IZatcaSettingsRepository, ZatcaSettingsRepository>();
             services.AddScoped<IInvoiceToZatcaRepository, InvoiceToZatcaRepository>();
+            services.AddScoped<IFodoRepository, FodoRepository>();
 
             return services;
         }

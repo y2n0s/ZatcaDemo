@@ -11,7 +11,7 @@ namespace Application.Contracts.IServices
     public interface IZatcaInvoiceSender
     {
         Task SendInvoiceToZatcaAsync(InvoiceToZatca invoice);
-        Task SendInvoiceToZatcaV2Async(InvoiceToZatca invoice, Seller supplier,
+        Task SendInvoiceToZatcaAsync(InvoiceToZatca invoice, Seller supplier,
             CertificateDetails certificateDetails);
     }
 }

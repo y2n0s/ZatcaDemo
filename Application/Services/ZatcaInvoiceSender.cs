@@ -211,7 +211,7 @@ namespace Application.Services
             }
         }
 
-        public async Task SendInvoiceToZatcaV2Async(InvoiceToZatca invoice, Seller supplier, 
+        public async Task SendInvoiceToZatcaAsync(InvoiceToZatca invoice, Seller supplier, 
             CertificateDetails certificateDetails)
         {
             if (certificateDetails != null)
@@ -312,9 +312,9 @@ namespace Application.Services
                     SubmissionDate = reportResult.Data.SubmissionDate
                 });
 
-                invoice.IsSent= true;   
-                invoice.IsAccepted= true;
-                invoice.CountOfRetries += 1;
+                invoice.IsSent = true;
+                invoice.CountOfRetries += 1;   
+                invoice.IsAccepted= string.Equals(reportResult.Data.ReportingStatus, "REPORTED") ? true : false;
 
                 await _invoiceToZatcaRepository.UpdateInvoiceAsync(invoice);
             }

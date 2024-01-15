@@ -1,4 +1,5 @@
-﻿using Application.Contracts.IServices;
+﻿using Application.Contracts.IRepository;
+using Application.Contracts.IServices;
 using Application.Models.Zatca;
 using Application.Services;
 using EInvoiceKSADemo.Helpers.Zatca;
@@ -6,6 +7,7 @@ using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Persistence.Data;
+using Persistence.Repositories;
 
 namespace Presentation
 {
@@ -28,7 +30,7 @@ namespace Presentation
             builder.Services.AddScoped<IZatcaInvoiceSender, ZatcaInvoiceSender>();
 
             builder.Services.AddInfrastructureServices(builder.Configuration);
-
+            
             return builder.Build();
         }
     }
