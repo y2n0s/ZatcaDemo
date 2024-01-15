@@ -21,10 +21,6 @@ namespace Persistence
             {
                 options.UseSqlServer(configuration.GetConnectionString("ZatcaDemoDB"));
             });
-            services.AddDbContext<FodoDbContext>(options =>
-            {
-                options.UseSqlServer(configuration.GetConnectionString("FodoDemoDB"));
-            });
 
             services.AddScoped<ICertificateSettingsRepository, CertificateSettingsRepository>();
             services.AddScoped<IInvoiceRepository, InvoiceRepository>();
