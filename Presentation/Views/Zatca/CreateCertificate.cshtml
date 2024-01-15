@@ -1,0 +1,95 @@
+﻿@model Application.Dtos.Requests.ZatcaCsrCreationRequestDto
+
+<form asp-action="CreateCertificate"
+      data-ajax-method="post"
+      data-ajax="true"
+      data-ajax-success="ShowSuccessMessage"
+      data-ajax-failure="ShowErrorMessage">
+
+    <div class="row">
+        <div class="col-4">
+            <label asp-for="VATNumber" class="form-label">VATNumber</label>
+            <input type="text" class="form-control" asp-for="VATNumber">
+            <span asp-validation-for="VATNumber" class="text-danger"></span>
+        </div>
+
+        <div class="col-4">
+            <label asp-for="Email" class="form-label">Email</label>
+            <input type="email" class="form-control" asp-for="Email">
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <label asp-for="LocationAddress " class="form-label">LocationAddress </label>
+            <input type="text" class="form-control" asp-for="LocationAddress ">
+            <span asp-validation-for="LocationAddress" class="text-danger"></span>
+        </div>
+        <div class="col-4">
+            <label asp-for="OrganizationName" class="form-label">OrganizationName </label>
+            <input type="text" class="form-control" asp-for="OrganizationName">
+            <span asp-validation-for="OrganizationName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <label asp-for="InvoiceType" class="form-label">InvoiceType</label>
+            <select class="form-control" asp-for="InvoiceType" asp-items="@ViewData["InvoiceTypes"] as SelectList">
+                 
+            </select> 
+            <span asp-validation-for="InvoiceType" class="text-danger"></span>
+        </div>
+        <div class="col-4">
+            <label asp-for="CountryName" class="form-label">CountryName</label>
+            <input type="text" class="form-control" value="SA" readonly>
+
+        </div>
+      
+    </div>
+   
+   
+    <div class="row">   
+        <div class="col-4">
+            <label asp-for="BusinessCategory" class="form-label">BusinessCategory </label>
+            <input type="text" class="form-control" asp-for="BusinessCategory">
+            <span asp-validation-for="BusinessCategory" class="text-danger"></span>
+        </div>
+        <div class="col-4 form-check form-switch mt-4 mt-lg-5"> 
+            <input class="form-check-input" type="checkbox" role="switch" asp-for="IsProduction">
+            <label class="form-check-label" asp-for="IsProduction">Production</label>
+        </div>
+    </div> 
+
+    <div class="col-12 mt-3 ">
+        <button type="submit" class="btn btn-primary">Generate</button>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        function ShowSuccessMessage() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Saved successfully!',
+                customClass: {
+                    confirmButton: "btn btn-primary"
+                }
+            });
+        }
+        function ShowErrorMessage(message = 'Something went wrong!') {
+            console.log(message)
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: message.responseText != undefined ? message.responseText : message,
+                customClass: {
+                    confirmButton: "btn btn-primary"
+                }
+            });
+        }
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+}

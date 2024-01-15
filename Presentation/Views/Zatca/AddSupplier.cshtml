@@ -1,0 +1,117 @@
+﻿@model Application.Dtos.Requests.ZatcaSupplierCreationRequestDto
+
+<form asp-action="AddSupplier"
+data-ajax-method="post" 
+data-ajax="true"
+data-ajax-success="ShowSuccessMessage"
+data-ajax-failure="ShowErrorMessage">
+
+    <div class="row">
+        <div class="col-4">
+            <label asp-for="SellerTRN" class="form-label">SellerTRN </label>
+            <input type="text" class="form-control" asp-for="SellerTRN">
+              <span asp-validation-for="SellerTRN" class="text-danger"></span> 
+        </div>
+
+        <div class="col-4">
+            <label asp-for="SellerName" class="form-label">SellerName</label>
+            <input type="text" class="form-control" asp-for="SellerName">
+            <span asp-validation-for="SellerName" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-4">
+            <label asp-for="StreetName" class="form-label">StreetName </label>
+            <input type="text" class="form-control" asp-for="StreetName ">
+            <span asp-validation-for="StreetName" class="text-danger"></span>
+        </div>
+
+        <div class="col-4">
+            <label asp-for="CityName" class="form-label">CityName </label>
+            <input type="text" class="form-control" asp-for="CityName ">
+            <span asp-validation-for="CityName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <label asp-for="DistrictName" class="form-label">DistrictName </label>
+            <input type="text" class="form-control" asp-for="DistrictName ">
+            <span asp-validation-for="DistrictName" class="text-danger"></span>
+        </div>
+
+        <div class="col-4">
+            <label asp-for="BuildingNumber" class="form-label">BuildingNumber </label>
+            <input type="text" class="form-control" asp-for="BuildingNumber ">
+            <span asp-validation-for="BuildingNumber" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <label asp-for="IdentityType" class="form-label">IdentityType</label> 
+            <select class="form-control" asp-for="IdentityType" asp-items="@ViewData["SellerIdentities"] as SelectList">
+            </select>
+            <span asp-validation-for="IdentityType" class="text-danger"></span>
+        </div>
+
+        <div class="col-4">
+            <label asp-for="IdentityNumber" class="form-label">IdentityNumber</label>
+            <input type="text" class="form-control" asp-for="IdentityNumber">
+            <span asp-validation-for="IdentityNumber" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <label class="form-label">CountryCode</label>
+            <input type="text" class="form-control" value="SA" readonly>
+            <span asp-validation-for="CountryCode" class="text-danger"></span>
+        </div>
+
+        <div class="col-4">
+            <label asp-for="PostalCode" class="form-label">PostalCode </label>
+            <input type="text" class="form-control" asp-for="PostalCode">
+            <span asp-validation-for="PostalCode" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-8">
+            <label asp-for="AdditionalStreetAddress " class="form-label">Additional Street Address </label>
+            <input type="text" class="form-control" asp-for="AdditionalStreetAddress">
+            <span asp-validation-for="AdditionalStreetAddress" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-12 mt-3 ">
+        <button type="submit" class="btn btn-primary">Add</button>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        function ShowSuccessMessage()
+    {
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Saved successfully!',
+            customClass: {
+                confirmButton: "btn btn-primary"
+            }
+        });
+    }
+    function ShowErrorMessage(message = 'Something went wrong!') {
+        console.log(message)
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: message.responseText != undefined ? message.responseText : message ,
+            customClass: {
+                confirmButton: "btn btn-primary"
+            }
+        });
+    }
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+}
