@@ -75,7 +75,7 @@ namespace Infrastructure.Jobs
                 await _zatcaInvoiceSender.SendInvoiceToZatcaAsync(invoice, supplier, certificateDetails);
 
                 var fodoInvoice = fodoInvoices.SingleOrDefault(x=>x.InvoiceId == invoice.InvoiceId);
-                fodoInvoice.IsSent= true;
+                if(fodoInvoice is not null) fodoInvoice.IsSent = true;
             }
             #endregion
 
