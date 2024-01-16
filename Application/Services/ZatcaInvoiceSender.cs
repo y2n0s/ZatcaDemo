@@ -368,19 +368,23 @@ namespace Application.Services
             //Index =  1, ProductName = "Item", Quantity = 1, NetPrice = 100, Tax = 15, TaxCategory = "S",
 
             List<LineItem> items = new List<LineItem>();
+            int indexCounter = 1;
+
             foreach (var model in invoiceItemModels)
             {
                 var lineItem = new LineItem
                 {
                     Id = model.Id,
-                    Index = model.Index,
-                    ProductName = model.ProductName,
-                    Quantity = model.Quantity,
-                    NetPrice = model.NetPrice,
-                    Tax = model.Tax
+                    //Index = int.Parse(model.Id.Substring(1,3)),
+                    Index = indexCounter,
+                    ProductName = model.Name,
+                    Quantity = model.Qty,
+                    NetPrice = model.NetValue,
+                    Tax = model.VATPercentage
                 };
 
                 items.Add(lineItem);
+                indexCounter++;
             }
 
             return items;
