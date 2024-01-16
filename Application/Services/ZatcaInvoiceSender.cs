@@ -227,7 +227,7 @@ namespace Application.Services
                 InvoiceNumber = invoice.InvoiceId.ToString(),
                 //Id = invoice.InvoiceId.ToString(),//guid
                 Id = invoice.Id.ToString(),//guid
-                Order = (int)invoice.DetailId,
+                Order = invoice.DetailId,
                 //Tax = (double)invoice.TaxPercentage,
                 //                Discount = 30.00,
                 Lines = invoiceItems,
@@ -378,9 +378,9 @@ namespace Application.Services
                     //Index = int.Parse(model.Id.Substring(1,3)),
                     Index = indexCounter,
                     ProductName = model.Name,
-                    Quantity = model.Qty,
-                    NetPrice = model.NetValue,
-                    Tax = model.VATPercentage
+                    Quantity = double.Parse(model.Qty),
+                    NetPrice = double.Parse(model.NetValue),
+                    Tax = double.Parse(model.VATPercentage)
                 };
 
                 items.Add(lineItem);

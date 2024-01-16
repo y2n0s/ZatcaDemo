@@ -55,8 +55,8 @@ namespace Infrastructure.Jobs
            var fodoInvoices = await _fodoRepository.GetFodoNotSentInvoicesAsync();
             _logger.LogInformation($"{fodoInvoices.Count()} invoices have been fetched from api");
 
-            if (!fodoInvoices.Any())
-                return;
+            //if (!fodoInvoices.Any())
+            //    return;
             #endregion
 
             #region Fodo Invoices To Zatca Invoices Conversion And Saving
@@ -67,6 +67,10 @@ namespace Infrastructure.Jobs
 
             #region Send Invoices To Zatca
             var invoices = await _invoiceToZatcaRepository.GetAllInvoicesToSendAsync();
+            
+            if (!invoices.Any())
+                return;
+
             var supplier = await _supplierRepository.GetSupplierAsync();
             var certificateDetails = _certificateConfiguration.GetCertificateDetails();
 

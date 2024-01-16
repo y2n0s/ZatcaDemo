@@ -17,17 +17,17 @@ namespace Application.Models.Invoice
         //public string ProductName { get; set; }
         public string Name { get; set; }
         //public double Quantity { get; set; }
-        public double Qty { get; set; }
+        public string Qty { get; set; }
         //public double NetPrice { get; set; }
-        public double Price { get; set; }//gross price
-        public double NetValue { get; set; }
+        public string Price { get; set; }//gross price
+        public string NetValue { get; set; }
         //public double LineDiscount { get; set; }
         //public double PriceDiscount { get; set; }
-        public double TotalDiscount { get; set; }
+        public string TotalDiscount { get; set; }
         /// <summary>
         /// The line VAT amount (KSA-11) must be Invoice line net amount (BT-131) x(Line VAT rate (BT152)/100)
         /// </summary>
-        public double VAT { get; set; }
+        public string VAT { get; set; }
         //public double TaxAmount { get; set; }
         //public double TotalWithTax { get; set; }
 
@@ -47,7 +47,7 @@ namespace Application.Models.Invoice
         //}
 
 
-        public double VATPercentage { get; set; }
+        public string VATPercentage { get; set; }
         //public double Tax { get; set; }
         //public string TaxCategory { get; set; } = "S";
         //public string TaxCategoryReasonCode { set; get; }

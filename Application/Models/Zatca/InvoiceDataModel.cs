@@ -26,7 +26,7 @@ namespace Application.Models.Zatca
         public string TransactionTypeCode { get; set; }
 
         public string Notes { get; set; }
-        public int Order { get; set; }
+        public long Order { get; set; }
 
         public string IssueDate { get; set; }
 
